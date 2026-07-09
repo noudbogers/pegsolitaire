@@ -15,11 +15,18 @@ class TOMLConfig:
     def __init__(self, config_file='config.toml'):
         self.config_file = Path(config_file)
 
-        if not self.config_file.excists():
-            raise FileNotFoundError(f"Config file not found:" {config_file}")
+#        if not self.config_file.excists():
+#            raise FileNotFoundError(f"Config file not found:" {config_file}")
         
-        with open(self.config_file, 'rb') as f:
-            self.config = tomllib.load(f)
+        try:
+            with open(self.config_file, 'rb') as f:
+                self.config = tomllib.load(f)
+        except FileNotFoundError:
+            print(f"Config file {config_file} not found, using defaults")
+                self.config = {}
+        except tomllib.TOMLDecodeError as e:
+            print(f"Error parsing TOML: {e}")
+            raise
     
     def get(self, key, default=None):
         """Get a top-level board configuration value"""
@@ -41,3 +48,5 @@ config = TOMLConfig('config.toml')
 
 # print(f"Value: {<value variable name>}")
 # print(f"Board configuration: {<board configuration variable name>}")
+
+# Get with defaults
